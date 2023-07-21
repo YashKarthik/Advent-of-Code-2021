@@ -47,33 +47,25 @@ int main() {
     numOfLines++;
   }
 
-  //char commandStrings[SIZE][10] = {
-  //  "forward 5",
-  //  "down 5",
-  //  "forward 8",
-  //  "up 3",
-  //  "down 8",
-  //  "forward 2",
-  //};
-
-  //numOfLines = 6;
-
   int hori = 0;
   int vert = 0;
+  int aim = 0;
 
   for (int i = 0; i < numOfLines; i++) {
     char **split_strs = split_string(commandStrings[i], ' ');
 
     if (strcmp(split_strs[0], "forward") == 0) {
       hori += atoi(split_strs[1]);
+      vert += aim * atoi(split_strs[1]);
     } else if (strcmp(split_strs[0], "down") == 0) {
-      vert += atoi(split_strs[1]);
+      aim += atoi(split_strs[1]);
     } else if (strcmp(split_strs[0], "up") == 0) {
-      vert -= atoi(split_strs[1]);
+      aim -= atoi(split_strs[1]);
     }
     free(split_strs);
   }
 
   printf("hori(%i) * vert(%i) = %i\n", hori, vert, hori*vert);
+  fclose(f);
   return 0;
 }
