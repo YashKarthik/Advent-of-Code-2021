@@ -12,20 +12,10 @@ int binaryToInt(char *binNum) {
   return result;
 }
 
-int main(void) {
-  FILE* f = fopen("./input3.txt", "r");
-  int numOfLines = 0;
-  char diagnosticReport[SIZE][30];
-
-  char tempLine[30];
-  while (fgets(tempLine, 30, f) != NULL) {
-    strcpy(diagnosticReport[numOfLines], tempLine);
-    numOfLines++;
-  }
+int part1(char diagnosticReport[SIZE][30], int numOfLines) {
 
   int rowLength = strlen(diagnosticReport[0]);
-
-  char binGammaRate[rowLength];;
+  char binGammaRate[rowLength];
   char binEpsilonRate[rowLength];
 
   for (int position = 0; position < rowLength; position++) {
@@ -46,8 +36,50 @@ int main(void) {
     }
   }
 
-  printf("Gamma: %s;\nEpsilon: %s;\n", binGammaRate, binEpsilonRate);
-  printf("%i\n", binaryToInt(binGammaRate)*binaryToInt(binEpsilonRate));
+  return binaryToInt(binGammaRate)*binaryToInt(binEpsilonRate);
+}
 
+char* filterRows(char filterInput[][30], int numOfRows, char which) {
+  char* result = malloc(numOfRows*sizeof(char[30]));
+
+  while (numOfRows != 1) {
+    for (int position = 0; position < strlen(filterInput[0]); position++) {
+      for (int row = 0; row < numOfRows; row++) {
+
+        if (filterInput[row][position] == which) {}
+
+      }
+    }
+  }
+
+  return result;
+}
+
+int part2(char diagnosticReport[SIZE][30], int numOfLines) {
+  int rowLength = strlen(diagnosticReport[0]);
+  char oxygenRatingOptions[SIZE][30];
+
+  char* filteredRow = filterRows(diagnosticReport, numOfLines, 0);
+  printf("%s", filteredRow);
+
+  free(filteredRow);
+  return 0;
+}
+
+int main(void) {
+  FILE* f = fopen("./input3.txt", "r");
+  int numOfLines = 0;
+  char diagnosticReport[SIZE][30];
+
+  char tempLine[30];
+  while (fgets(tempLine, 30, f) != NULL) {
+    strcpy(diagnosticReport[numOfLines], tempLine);
+    numOfLines++;
+  }
+  fclose(f);
+
+  // Part 1
+  //printf("Power consumption: %i\n",part1(diagnosticReport, numOfLines));
+  part2(diagnosticReport, numOfLines);
   return 0;
 }
