@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "math.h"
-#define SIZE 2048
+#define SIZE 1000
 
 int binaryToInt(char *binNum) {
   int result = 0;
@@ -39,31 +39,50 @@ int part1(char diagnosticReport[SIZE][30], int numOfLines) {
   return binaryToInt(binGammaRate)*binaryToInt(binEpsilonRate);
 }
 
-char* filterRows(char filterInput[][30], int numOfRows, char which) {
-  char* result = malloc(numOfRows*sizeof(char[30]));
+char* filterRows(char** filterInput, int numOfRows, int position, int greater) {
+  if (numOfRows == 1) {
+    char* rating = (char*)malloc(12 * sizeof(char));
+    strcpy(rating, filterInput[0]);
+    return rating;
 
-  while (numOfRows != 1) {
-    for (int position = 0; position < strlen(filterInput[0]); position++) {
-      for (int row = 0; row < numOfRows; row++) {
+  }
+  char** ones_future_list = (char**)malloc(numOfRows * sizeof(char*));
+  char** zeroes_future_list = (char**)malloc(numOfRows * sizeof(char*));
+  int ones = 0;
+  int zeroes = 0;
 
-        if (filterInput[row][position] == which) {}
-
-      }
+  for (int row = 0; row < numOfRows; row++) {
+    if (filterInput[row][position] == '0') {
+      zeroes_future_list[zeroes] = (char*)malloc(12 * sizeof(char));
+      strcpy(zeroes_future_list[zeroes], filterInput[row]);
+      zeroes++;
+    } else {
+      ones_future_list[ones] = (char*)malloc(12 * sizeof(char));
+      strcpy(ones_future_list[ones], filterInput[row]);
+      ones++;
     }
   }
 
-  return result;
+  if (greater == 1) {
+    if (zeroes > ones) return filterRows(zeroes_future_list, zeroes, position+1, greater);
+    else  return filterRows(ones_future_list, ones, position+1, greater);
+  } else {
+    if (zeroes > ones) return filterRows(ones_future_list, ones, position+1, greater);
+    else return filterRows(zeroes_future_list, zeroes, position+1, greater);
+  }
 }
 
-int part2(char diagnosticReport[SIZE][30], int numOfLines) {
+int part2(char** diagnosticReport, int numOfLines) {
   int rowLength = strlen(diagnosticReport[0]);
   char oxygenRatingOptions[SIZE][30];
 
-  char* filteredRow = filterRows(diagnosticReport, numOfLines, 0);
-  printf("%s", filteredRow);
+  char* oxy = filterRows(diagnosticReport, numOfLines, 0, 0);
+  char* scrubber = filterRows(diagnosticReport, numOfLines, 0, 1);
+  int result = binaryToInt(oxy)*binaryToInt(scrubber);
 
-  free(filteredRow);
-  return 0;
+  free(oxy);
+  free(scrubber);
+  return result;
 }
 
 int main(void) {
@@ -78,8 +97,14 @@ int main(void) {
   }
   fclose(f);
 
+  char **diagRepPtrs = (char **)malloc(SIZE * sizeof(char *));
+  for (int i = 0; i < SIZE; i++) {
+    diagRepPtrs[i] = (char *)malloc(30 * sizeof(char));
+    strcpy(diagRepPtrs[i], diagnosticReport[i]);
+  }
+
   // Part 1
   //printf("Power consumption: %i\n",part1(diagnosticReport, numOfLines));
-  part2(diagnosticReport, numOfLines);
+  printf("Life support rating: %i\n", part2(diagRepPtrs, numOfLines));;
   return 0;
 }
