@@ -63,13 +63,26 @@ char* filterRows(char** filterInput, int numOfRows, int position, int greater) {
     }
   }
 
+  char* result;
   if (greater == 1) {
-    if (zeroes > ones) return filterRows(zeroes_future_list, zeroes, position+1, greater);
-    else  return filterRows(ones_future_list, ones, position+1, greater);
+    if (zeroes > ones) result = filterRows(zeroes_future_list, zeroes, position+1, greater);
+    else  result = filterRows(ones_future_list, ones, position+1, greater);
   } else {
-    if (zeroes > ones) return filterRows(ones_future_list, ones, position+1, greater);
-    else return filterRows(zeroes_future_list, zeroes, position+1, greater);
+    if (zeroes > ones) result = filterRows(ones_future_list, ones, position+1, greater);
+    else result = filterRows(zeroes_future_list, zeroes, position+1, greater);
   }
+
+  // Free allocated memory for future lists
+  for (int i = 0; i < zeroes; i++) {
+    free(zeroes_future_list[i]);
+  }
+  for (int i = 0; i < ones; i++) {
+    free(ones_future_list[i]);
+  }
+  free(zeroes_future_list);
+  free(ones_future_list);
+
+  return result;
 }
 
 int part2(char** diagnosticReport, int numOfLines) {
@@ -103,8 +116,7 @@ int main(void) {
     strcpy(diagRepPtrs[i], diagnosticReport[i]);
   }
 
-  // Part 1
-  //printf("Power consumption: %i\n",part1(diagnosticReport, numOfLines));
+  printf("Power consumption: %i\n",part1(diagnosticReport, numOfLines));
   printf("Life support rating: %i\n", part2(diagRepPtrs, numOfLines));;
   return 0;
 }
