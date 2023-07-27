@@ -17,6 +17,8 @@ typedef struct BingoBoard {
   int numOfMarkedCells;
 } BingoBoard;
 
+int boardIdxOfWinner(BingoBoard *bingoBoards, int numOfBoards);
+
 int main() {
   FILE *f = fopen("./input4.txt", "r");
 
@@ -64,8 +66,11 @@ int main() {
 
   printf("Num of boards parsed: %i\n", numOfBoards);
 
-  int bingoMove = atoi(strtok(bingo_moves, ","));
-  while (bingoMove) {
+  char *bingoMoveStr = strtok(bingo_moves, ",");
+  while (bingoMoveStr != NULL) {
+    int bingoMove = atoi(bingoMoveStr);
+    printf("Move: %i\n", bingoMove);
+
     for (int boardIdx = 0; boardIdx < numOfBoards; boardIdx++) {
       for (int cellIdx = 0; cellIdx < (ROWS * COLS); cellIdx++) {
 
@@ -73,10 +78,18 @@ int main() {
 
         bingoBoards[boardIdx].cells[cellIdx].marked = true;
         bingoBoards[boardIdx].numOfMarkedCells++;
+        printf("B_num: %i, Cell: %i\n", boardIdx, bingoBoards[boardIdx].cells[cellIdx].number);
 
       }
     }
-    bingoMove = atoi(strtok(NULL, ","));
+
+    int winnerIdx = boardIdxOfWinner(bingoBoards, numOfBoards);
+    if (winnerIdx > 0) {
+      printf("Winner board: %i", winnerIdx+1);
+      break;
+    }
+
+    bingoMoveStr = strtok(NULL, ",");
   }
 
 
@@ -86,13 +99,13 @@ int main() {
   return 0;
 }
 
-int checkWin(BingoBoard *bingoBoards, int numOfBoards) {
+int boardIdxOfWinner(BingoBoard *bingoBoards, int numOfBoards) {
 
   for (int boardIdx = 0; boardIdx < numOfBoards; boardIdx++) {
-    for (int rowStart = 0; rowStart < (ROWS * COLS) - 5; rowStart+=5) {
+    if (bingoBoards[boardIdx].numOfMarkedCells < 5) return -1;
 
+    for (int rowStart = 0; rowStart < (ROWS * COLS) - 5; rowStart+=5) {
       int markedInRow = 0;
-      if (bingoBoards[boardIdx].numOfMarkedCells < 5) return -1;
 
       if (
           bingoBoards[boardIdx].cells[rowStart].marked == true &&
@@ -103,19 +116,18 @@ int checkWin(BingoBoard *bingoBoards, int numOfBoards) {
          ) return boardIdx;
     }
 
-    //for (int colIdx = 0; colIdx < (ROWS * COLS) - 5; colIdx+=5) {
+    for (int colIdx = 0; colIdx < COLS; colIdx++) {
+      int markedInRow = 0;
 
-    //  int markedInRow = 0;
-    //  if (bingoBoards[boardIdx].numOfMarkedCells < 5) return -1;
-
-    //  if (
-    //      bingoBoards[boardIdx].cells[colIdx].marked == true &&
-    //      bingoBoards[boardIdx].cells[colIdx+1].marked == true &&
-    //      bingoBoards[boardIdx].cells[colIdx+2].marked == true &&
-    //      bingoBoards[boardIdx].cells[colIdx+3].marked == true &&
-    //      bingoBoards[boardIdx].cells[colIdx+4].marked == true
-    //     ) return boardIdx;
-    //}
+      if (
+          bingoBoards[boardIdx].cells[colIdx].marked == true &&
+          bingoBoards[boardIdx].cells[colIdx+5].marked == true &&
+          bingoBoards[boardIdx].cells[colIdx+10].marked == true &&
+          bingoBoards[boardIdx].cells[colIdx+15].marked == true &&
+          bingoBoards[boardIdx].cells[colIdx+20].marked == true
+         ) return boardIdx;
+    }
   }
 
+  return -2;
 }
