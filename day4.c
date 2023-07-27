@@ -17,6 +17,7 @@ typedef struct BingoBoard {
   int numOfMarkedCells;
 } BingoBoard;
 
+int sumUnmarkedCells(BingoBoard winnerBoard);
 int boardIdxOfWinner(BingoBoard *bingoBoards, int numOfBoards);
 
 int main() {
@@ -85,7 +86,11 @@ int main() {
 
     int winnerIdx = boardIdxOfWinner(bingoBoards, numOfBoards);
     if (winnerIdx > 0) {
-      printf("Winner board: %i", winnerIdx+1);
+      int unmarkedSum = sumUnmarkedCells(bingoBoards[winnerIdx]);
+      printf("\nWinner board: %i\n", winnerIdx+1);
+      printf("Unmarked sum: %i\n", unmarkedSum);
+      printf("Move: %i\n", bingoMove);
+      printf("Score: %i\n", bingoMove*unmarkedSum);
       break;
     }
 
@@ -130,4 +135,17 @@ int boardIdxOfWinner(BingoBoard *bingoBoards, int numOfBoards) {
   }
 
   return -2;
+}
+
+int sumUnmarkedCells(BingoBoard winnerBoard) {
+
+  int unmarkedSum = 0;
+  for (int cellIdx = 0; cellIdx < (ROWS * COLS); cellIdx++) {
+
+    if (winnerBoard.cells[cellIdx].marked) continue;
+
+    unmarkedSum += winnerBoard.cells[cellIdx].number;
+  }
+
+  return unmarkedSum;
 }
