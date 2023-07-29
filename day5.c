@@ -59,8 +59,7 @@ int main() {
     line currLine = lines[currLineIdx];
     int orthogonality = isOrthogonal(currLine);
 
-    if (orthogonality == 0) continue;
-    else if (orthogonality == 1) { // horizontal line
+    if (orthogonality == 1) { // horizontal line
 
       if (currLine.start.x < currLine.end.x) {
         for (int x = currLine.start.x; x <= currLine.end.x; x++) {
@@ -83,7 +82,49 @@ int main() {
           linesMap[y][currLine.start.x] += 1;
         }
       }
+    } else { // diagonals
 
+      if (currLine.start.x < currLine.end.x) {
+
+        if (currLine.start.y < currLine.end.y) {
+          int y = currLine.start.y;
+          for (int x = currLine.start.x; x <= currLine.end.x; x++) {
+            if (y > currLine.end.y) break;
+            linesMap[y][x] += 1;
+            y++;
+          }
+        } else {
+
+          int y = currLine.start.y;
+          for (int x = currLine.start.x; x <= currLine.end.x; x++) {
+            if (y < currLine.end.y) break;
+            linesMap[y][x] += 1;
+            y--;
+          }
+
+        }
+
+      } else {
+
+        if (currLine.start.y < currLine.end.y) {
+          int y = currLine.start.y;
+          for (int x = currLine.start.x; x >= currLine.end.x; x--) {
+            if (y > currLine.end.y) break;
+            linesMap[y][x] += 1;
+            y++;
+          }
+        } else {
+
+          int y = currLine.start.y;
+          for (int x = currLine.start.x; x >= currLine.end.x; x--) {
+            if (y < currLine.end.y) break;
+            linesMap[y][x] += 1;
+            y--;
+          }
+
+        }
+
+      }
     }
   }
 
