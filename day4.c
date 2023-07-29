@@ -15,10 +15,11 @@ typedef struct GridUnit {
 typedef struct BingoBoard {
   GridUnit cells[ROWS * COLS];
   int numOfMarkedCells;
+  bool completed;
 } BingoBoard;
 
 int sumUnmarkedCells(BingoBoard winnerBoard);
-int boardIdxOfWinner(BingoBoard *bingoBoards, int numOfBoards);
+int boardNumOftheFinalWinner(BingoBoard *bingoBoards, int numOfBoards);
 
 int main() {
   FILE *f = fopen("./input4.txt", "r");
@@ -68,6 +69,8 @@ int main() {
   printf("Num of boards parsed: %i\n", numOfBoards);
 
   char *bingoMoveStr = strtok(bingo_moves, ",");
+  int loserBoardIdx = -1;
+
   while (bingoMoveStr != NULL) {
     int bingoMove = atoi(bingoMoveStr);
     printf("Move: %i\n", bingoMove);
@@ -84,12 +87,21 @@ int main() {
       }
     }
 
-    int winnerIdx = boardIdxOfWinner(bingoBoards, numOfBoards);
-    if (winnerIdx > 0) {
-      int unmarkedSum = sumUnmarkedCells(bingoBoards[winnerIdx]);
-      printf("\nWinner board: %i\n", winnerIdx+1);
+    int finalWinnerIdx = boardNumOftheFinalWinner(bingoBoards, numOfBoards);
+    if (finalWinnerIdx == 1) {
+      for (int bdx = 0; bdx < numOfBoards; bdx++) {
+        if (bingoBoards[bdx].completed == false) {
+          printf("found loser");
+          loserBoardIdx = bdx;
+        }
+      }
+      printf("Loser board: %i\n", loserBoardIdx);
+    }
+    if (loserBoardIdx != -1) {
+      int unmarkedSum = sumUnmarkedCells(bingoBoards[loserBoardIdx]);
+      printf("\nFinal Winner board: %i\n", loserBoardIdx+1);
       printf("Unmarked sum: %i\n", unmarkedSum);
-      printf("Move: %i\n", bingoMove);
+      printf("Winning Move: %i\n", bingoMove);
       printf("Score: %i\n", bingoMove*unmarkedSum);
       break;
     }
@@ -104,13 +116,15 @@ int main() {
   return 0;
 }
 
-int boardIdxOfWinner(BingoBoard *bingoBoards, int numOfBoards) {
+int boardNumOftheFinalWinner(BingoBoard *bingoBoards, int numOfBoards) {
+
+  int numOfWinners = 0;
 
   for (int boardIdx = 0; boardIdx < numOfBoards; boardIdx++) {
-    if (bingoBoards[boardIdx].numOfMarkedCells < 5) return -1;
+
+    if (bingoBoards[boardIdx].completed) continue;
 
     for (int rowStart = 0; rowStart < (ROWS * COLS) - 5; rowStart+=5) {
-      int markedInRow = 0;
 
       if (
           bingoBoards[boardIdx].cells[rowStart].marked == true &&
@@ -118,11 +132,16 @@ int boardIdxOfWinner(BingoBoard *bingoBoards, int numOfBoards) {
           bingoBoards[boardIdx].cells[rowStart+2].marked == true &&
           bingoBoards[boardIdx].cells[rowStart+3].marked == true &&
           bingoBoards[boardIdx].cells[rowStart+4].marked == true
-         ) return boardIdx;
+         ) {
+        numOfWinners++;
+        bingoBoards[boardIdx].completed = true;
+        break;
+      }
     }
 
+    if (bingoBoards[boardIdx].completed) continue;
+
     for (int colIdx = 0; colIdx < COLS; colIdx++) {
-      int markedInRow = 0;
 
       if (
           bingoBoards[boardIdx].cells[colIdx].marked == true &&
@@ -130,11 +149,16 @@ int boardIdxOfWinner(BingoBoard *bingoBoards, int numOfBoards) {
           bingoBoards[boardIdx].cells[colIdx+10].marked == true &&
           bingoBoards[boardIdx].cells[colIdx+15].marked == true &&
           bingoBoards[boardIdx].cells[colIdx+20].marked == true
-         ) return boardIdx;
+         ) {
+        numOfWinners++;
+        break;
+      }
+      printf("potential: %i", boardIdx);
     }
   }
+  if (numOfWinners == numOfBoards - 1) return 1;
 
-  return -2;
+  return 0;
 }
 
 int sumUnmarkedCells(BingoBoard winnerBoard) {
