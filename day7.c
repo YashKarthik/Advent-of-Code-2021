@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <math.h>
 
 #define MAX_LEN 10000
 
@@ -64,9 +65,16 @@ int main() {
   for (int i = 0; i < numOfElems; i++) {
     sum += sortedArray[i];
   }
-  int mean = sum / numOfElems;
+  int mean = round(sum / (numOfElems + 0.0));
   printf("Mean: %i\n", mean);
 
+  int fuel_2 = 0;
+  for (int i = 0; i < numOfElems; i++) {
+    int diff = abs(sortedArray[i] - mean);
+
+    fuel_2 += (diff * (diff + 1)) / 2;
+  }
+  printf("Fuel 2: %i\n", fuel_2);
 
   fclose(f);
   return 0;

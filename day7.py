@@ -1,10 +1,7 @@
-import statistics
-f = open("input7.txt").readlines()
-positions = [int(x) for x in f[0].split(",")]
-aim=round(statistics.median(positions))
+data = [int(x) for x in open("input7.txt").read().strip().split(",")]
 
-fuel=0
-for position in positions:
-    fuel+=abs(position-aim)
+pt1 = {x: sum([abs(x - z) for z in data]) for x in range(0, max(data) + 1)}
+print(f"Part 1: {min(pt1.values())}")
 
-print(aim,fuel)
+pt2 = {x: sum([abs(x - z) / 2 * (2 + (abs(x - z) - 1)) for z in data]) for x in range(0, max(data) + 1)}
+print(f"Part 2: {int(min(pt2.values()))}")
