@@ -2,8 +2,10 @@
 #include <iostream>
 #include <string>
 
+
 const int N{1024};
 int isLowPoint(int (*heightMap)[N], int currRow, int currCol, int numCols, int numRows);
+int findBasinSize(int (*heightMap)[N], int row, int col, int numCols, int numRows);
 
 int main() {
   int numCols{0};
@@ -33,9 +35,20 @@ int main() {
   for (int i{0}; i < numRows; i++) {
     for (int j{0}; j < numCols; j++) {
       if (isLowPoint(heightMap, i, j, numCols, numRows)) {
+        std::cout << heightMap[i][j] << " " <<
+        findBasinSize(heightMap, i, j, numCols, numRows) << std::endl;
+      }
+    }
+  }
+
+  for (int i{0}; i < numRows; i++) {
+    for (int j{0}; j < numCols; j++) {
+      if (isLowPoint(heightMap, i, j, numCols, numRows)) {
         std::cout << "\e[1m\033[31m"; 
 
         risk += 1 + heightMap[i][j];
+      } else if (heightMap[i][j] != 9) {
+        std::cout << "\033[38;5;216m"; 
       }
       std::cout << heightMap[i][j] << "\e[0m ";
     }
@@ -70,4 +83,35 @@ int isLowPoint(int (*heightMap)[N], int currRow, int currCol, int numCols, int n
   else fails++;
 
   return fails == 4 ? 1 : 0;
+}
+
+int findBasinSize(int (*heightMap)[N], int row, int col, int numCols, int numRows) {
+  int result{0};
+
+  if (row < 0) return result;
+  else if (col < 0) return result;
+  else if (row == numRows) return result;
+  else if (col == numCols) return result;
+
+  if (heightMap[row][col - 1] == heightMap[row][col] + 1) {
+    result++;
+    result += findBasinSize(heightMap, row, col - 1, numCols, numRows);
+  }
+
+  if (heightMap[row][col + 1] == heightMap[row][col] + 1) {
+    result++;
+    result += findBasinSize(heightMap, row, col + 1, numCols, numRows);
+  }
+
+  if (heightMap[row - 1][col] == heightMap[row][col] + 1) {
+    result++;
+    result += findBasinSize(heightMap, row - 1, col, numCols, numRows);
+  }
+
+  if (heightMap[row + 1][col] == heightMap[row][col] + 1) {
+    result++;
+    result += findBasinSize(heightMap, row + 1, col, numCols, numRows);
+  }
+
+  return result;
 }
